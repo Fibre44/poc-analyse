@@ -11,31 +11,56 @@ export const config = {
     },
 };
 
+type Datas = {
+    dsn: {}
+    society: {}
+    establishment: {}
+    assignement: {}
+    at: {},
+    classification: {},
+    contributionFund: {},
+    workContract: {}
+}
 
-
-const insertMongoDb = async (datas) => {
+const insertMongoDb = async (datas: Datas, client: string) => {
     const clientMongoDB = await connectMongoDb();
 
     const db = clientMongoDB.db();
     const newDsnInfo = {
+        client,
         ...datas.dsn
     }
     const newSociety = {
+        client,
         ...datas.society
     }
     const newEstablishment = {
+        client,
         ...datas.establishment
     }
+    const newAssignement = {
+        client,
+        ...datas.assignement
+    }
+    const contributionFund = {
+        client,
+        ...datas.contributionFund
+    }
     await db
-        .collection('society')
+        .collection('Society')
         .insertOne(newSociety);
     await db
         .collection('Establishment')
         .insertOne(newEstablishment);
     await db
-        .collection('dsn')
+        .collection('Dsn')
         .insertOne(newDsnInfo);
-
+    await db
+        .collection('Assignement')
+        .insertOne(newAssignement);
+    await db
+        .collection('ContributionFund')
+        .insertOne(contributionFund);
     clientMongoDB.close();
 
     return
@@ -52,7 +77,12 @@ const dsnParser = async (patch: string) => {
     const dsnDatas = {
         dsn: dsn.dsn,
         society: dsn.society,
-        establishment: dsn.establishment
+        establishment: dsn.establishment,
+        assignement: dsn.assignement,
+        at: dsn.at,
+        classification: dsn.classifications,
+        contributionFund: dsn.contributionFund,
+        workContract: dsn.workContract
     }
     return dsnDatas
 
@@ -81,6 +111,7 @@ const readFile = async (
     });
 };
 
+
 const handler: NextApiHandler = async (req, res) => {
     try {
         //Stockage du fichier
@@ -89,10 +120,12 @@ const handler: NextApiHandler = async (req, res) => {
         await fs.mkdir(path.join(process.cwd() + "/public", "/uploads"));
     }
     const fileInfo = await readFile(req, true);
-    const patch = fileInfo.files.dsn.filepath
+    const file: any = fileInfo.files.dsn
+    const patch = file.filepath
+    const client = fileInfo.fields.client.toString()
     const dsnDatas = await dsnParser(patch)
-    await insertMongoDb(dsnDatas)
-    res.json({ done: "ok" });
+    await insertMongoDb(dsnDatas, client)
+    res.json({ message: "Import du fichier avec succès" });
 };
 
 export default handler;

@@ -2,7 +2,7 @@ import { getSession } from 'next-auth/react';
 import { GetServerSideProps } from 'next'
 import { connectMongoDb } from '../../utils/connectMongoDb';
 import Link from 'next/link';
-import { ProjetCard } from '../../components/Projets/ProjetCard';
+import { ProjetCard } from '../../components/projets/ProjetCard';
 
 type Props = {
     projets: Projet[]
@@ -21,7 +21,7 @@ export default function Projets(props: Props) {
             Créer un nouveau projet
         </Link>
         {props.projets.length === 0 ?
-            <p>Vous n'avez pas encore de projet</p>
+            <p> Vous n &apos avez pas encore de projet</p>
             :
             props.projets.map(projet => <ProjetCard projet={projet} key={projet._id} />)}
     </div>

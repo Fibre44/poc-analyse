@@ -1,5 +1,7 @@
+import 'bootstrap-icons/font/bootstrap-icons'
 import 'bootstrap/dist/css/bootstrap.css'
 import { SessionProvider } from 'next-auth/react'
+
 import type { Session } from "next-auth"
 import type { AppProps } from 'next/app'
 export default function App({
@@ -7,6 +9,9 @@ export default function App({
   pageProps: { session, ...pageProps },
 }: AppProps<{ session: Session }>) {
   return (
-    <Component {...pageProps} />
+    <SessionProvider session={session}>
+      <Component {...pageProps} />
+    </SessionProvider>
+
   )
 }
